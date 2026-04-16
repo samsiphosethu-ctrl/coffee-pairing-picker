@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffee & Cannabis Pairing</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #FFFFFF;
+  color: #1B3A2F;
+}
+.widget {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 20px 32px;
+}
+.widget-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1B3A2F;
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+.widget-sub {
+  font-size: 14px;
+  color: #7A8B82;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.coffee-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.coffee-card {
+  background: #FFFFFF;
+  border: 1.5px solid rgba(27,58,47,0.15);
+  border-radius: 14px;
+  padding: 14px 6px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.12s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.coffee-card:hover { border-color: #1B3A2F; background: #F8F6F2; }
+.coffee-card:active { transform: scale(0.97); }
+.coffee-card.selected { border-color: #1B3A2F; background: #1B3A2F; }
+.coffee-card.selected .coffee-label { color: #FFFFFF; }
+.coffee-icon { font-size: 22px; display: block; margin-bottom: 6px; line-height: 1; }
+.coffee-label { font-size: 11px; font-weight: 700; color: #1B3A2F; display: block; line-height: 1.3; }
+.result-panel {
+  background: #F8F6F2;
+  border: 1.5px solid rgba(27,58,47,0.12);
+  border-radius: 14px;
+  padding: 20px 20px 18px;
+  transition: opacity 0.22s;
+  opacity: 0;
+  pointer-events: none;
+}
+.result-panel.visible { opacity: 1; pointer-events: auto; }
+.top-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.strain-block {
+  background: #1B3A2F;
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 76px;
+}
+.strain-block-icon { font-size: 20px; display: block; margin-bottom: 4px; line-height: 1; }
+.thc-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #D4A04A;
+  display: block;
+  line-height: 1.1;
+}
+.thc-label {
+  font-size: 9px;
+  color: rgba(255,255,255,0.65);
+  display: block;
+  margin-top: 2px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.result-info { flex: 1; }
+.strain-type {
+  display: inline-block;
+  background: rgba(212,160,74,0.15);
+  color: #7a5010;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.strain-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1B3A2F;
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+.strain-flavor {
+  font-size: 12px;
+  color: #7A8B82;
+  margin-bottom: 3px;
+}
+.strain-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1B3A2F;
+}
+.divider {
+  border: none;
+  border-top: 1px solid rgba(27,58,47,0.1);
+  margin: 14px 0;
+}
+.pairing-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7A8B82;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 5px;
+}
+.result-copy {
+  font-size: 13px;
+  color: #4A5D53;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+.result-cta {
+  display: inline-block;
+  background: #D4A04A;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 9px 18px;
+  border-radius: 20px;
+  transition: background 0.15s;
+  letter-spacing: 0.2px;
+}
+.result-cta:hover { background: #b8882e; }
+.reset-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #7A8B82;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  cursor: pointer;
+  padding: 4px;
+  font-family: inherit;
+}
+.reset-btn:hover { color: #1B3A2F; }
+@media (max-width: 420px) {
+  .coffee-grid { gap: 5px; }
+  .coffee-icon { font-size: 18px; }
+  .coffee-label { font-size: 10px; }
+}
+</style>
+</head>
+<body>
+ 
+<div class="widget" id="widget">
+  <h2 class="widget-heading">What's your coffee order?</h2>
+  <p class="widget-sub">We'll find your perfect strain pairing</p>
+ 
+  <div class="coffee-grid">
+    <div class="coffee-card" data-coffee="coldbrew" role="button" tabindex="0" aria-label="Cold brew">
+      <span class="coffee-icon">🧊</span>
+      <span class="coffee-label">Cold Brew</span>
+    </div>
+    <div class="coffee-card" data-coffee="americano" role="button" tabindex="0" aria-label="Americano">
+      <span class="coffee-icon">☕</span>
+      <span class="coffee-label">Americano</span>
+    </div>
+    <div class="coffee-card" data-coffee="cappuccino" role="button" tabindex="0" aria-label="Cappuccino">
+      <span class="coffee-icon">🫧</span>
+      <span class="coffee-label">Cappuccino</span>
+    </div>
+    <div class="coffee-card" data-coffee="latte" role="button" tabindex="0" aria-label="Iced latte">
+      <span class="coffee-icon">🥤</span>
+      <span class="coffee-label">Iced Latte</span>
+    </div>
+    <div class="coffee-card" data-coffee="pourover" role="button" tabindex="0" aria-label="Pour-over">
+      <span class="coffee-icon">🫗</span>
+      <span class="coffee-label">Pour-Over</span>
+    </div>
+  </div>
+ 
+  <div class="result-panel" id="result" role="region" aria-live="polite">
+    <div class="top-row">
+      <div class="strain-block">
+        <span class="strain-block-icon">🌿</span>
+        <span class="thc-value" id="result-thc"></span>
+        <span class="thc-label">THC</span>
+      </div>
+      <div class="result-info">
+        <span class="strain-type" id="result-type"></span>
+        <p class="strain-name" id="result-name"></p>
+        <p class="strain-flavor" id="result-flavor"></p>
+        <p class="strain-price" id="result-price"></p>
+      </div>
+    </div>
+    <hr class="divider">
+    <p class="pairing-label" id="result-coffee-label"></p>
+    <p class="result-copy" id="result-copy"></p>
+    <a class="result-cta" id="result-cta" href="#" target="_blank" rel="noopener">Shop this strain</a>
+    <button class="reset-btn" id="reset-btn">Start over</button>
+  </div>
+</div>
+ 
+<script>
+var results = {
+  coldbrew: {
+    thc: "26.47%",
+    type: "Sativa Hybrid",
+    name: "Super Lemon Haze",
+    flavor: "Earthy lemons and spicy pepper",
+    price: "From $13/g — $40/3.5g",
+    coffeeLabel: "Pairing: Cold Brew",
+    copy: "Zesty and uplifting, Super Lemon Haze enhances the natural brightness of a cold brew. Its citrus-forward profile complements coffee's acidity for a vibrant, energizing start to the day.",
+    cta: "Shop Super Lemon Haze",
+    url: "https://mood.com/product/super-lemon-haze"
+  },
+  americano: {
+    thc: "29.60%",
+    type: "50/50 Hybrid",
+    name: "Gary Payton",
+    flavor: "Citrus, skunky pepper",
+    price: "From $17/g — $54/3.5g",
+    coffeeLabel: "Pairing: Americano",
+    copy: "Gary Payton's savory diesel and citrus profile pairs with the rich depth of espresso. A smooth, steady experience with near-instant euphoria and social energy — no overwhelming stimulation.",
+    cta: "Shop Gary Payton",
+    url: "https://mood.com/product/gary-payton"
+  },
+  cappuccino: {
+    thc: "20.85%",
+    type: "50/50 Hybrid",
+    name: "Jealousy",
+    flavor: "Mild and sweet",
+    price: "From $13/g — $40/3.5g — $75/7g",
+    coffeeLabel: "Pairing: Cappuccino",
+    copy: "Jealousy's sweet, mild profile complements the frothy richness of steamed milk. A relaxed yet social high that pairs beautifully with a slow cappuccino and a good conversation.",
+    cta: "Shop Jealousy",
+    url: "https://mood.com/product/jealousy"
+  },
+  latte: {
+    thc: "20.72%",
+    type: "Indica-Dominant Hybrid",
+    name: "Pink Lemonade",
+    flavor: "Sweet and sour citrus",
+    price: "From $15/g — $48/3.5g",
+    coffeeLabel: "Pairing: Iced Vanilla Latte",
+    copy: "Sweet and citrusy with a social, uplifting vibe. Pink Lemonade's mellow character keeps you engaged while complementing the smooth sweetness of an iced latte — a natural match.",
+    cta: "Shop Pink Lemonade",
+    url: "https://mood.com/product/pink-lemonade"
+  },
+  pourover: {
+    thc: "28.89%",
+    type: "Sativa Hybrid",
+    name: "Tangie",
+    flavor: "Lively citrus and tangerine candy",
+    price: "From $17/g — $54/3.5g",
+    coffeeLabel: "Pairing: Pour-Over",
+    copy: "Tangie's bright tangerine aroma and energizing effects align with a fresh pour-over. Sparks social energy and creative connection alongside the fruity notes of a single-origin light roast.",
+    cta: "Shop Tangie",
+    url: "https://mood.com/product/tangie"
+  }
+};
+ 
+var cards = document.querySelectorAll('.coffee-card');
+var panel = document.getElementById('result');
+var thcEl = document.getElementById('result-thc');
+var typeEl = document.getElementById('result-type');
+var nameEl = document.getElementById('result-name');
+var flavorEl = document.getElementById('result-flavor');
+var priceEl = document.getElementById('result-price');
+var coffeeLabelEl = document.getElementById('result-coffee-label');
+var copyEl = document.getElementById('result-copy');
+var ctaEl = document.getElementById('result-cta');
+var resetBtn = document.getElementById('reset-btn');
+ 
+function selectCoffee(coffee) {
+  cards.forEach(function(c) { c.classList.toggle('selected', c.dataset.coffee === coffee); });
+  var r = results[coffee];
+  thcEl.textContent = r.thc;
+  typeEl.textContent = r.type;
+  nameEl.textContent = r.name;
+  flavorEl.textContent = r.flavor;
+  priceEl.textContent = r.price;
+  coffeeLabelEl.textContent = r.coffeeLabel;
+  copyEl.textContent = r.copy;
+  ctaEl.textContent = r.cta;
+  ctaEl.href = r.url;
+  panel.classList.add('visible');
+  sendHeight();
+}
+ 
+function reset() {
+  cards.forEach(function(c) { c.classList.remove('selected'); });
+  panel.classList.remove('visible');
+  sendHeight();
+}
+ 
+cards.forEach(function(card) {
+  card.addEventListener('click', function() { selectCoffee(this.dataset.coffee); });
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectCoffee(this.dataset.coffee); }
+  });
+});
+ 
+resetBtn.addEventListener('click', reset);
+ 
+function sendHeight() {
+  setTimeout(function() {
+    var h = document.getElementById('widget').scrollHeight + 16;
+    window.parent.postMessage({ type: 'iframeHeight', height: h }, '*');
+  }, 50);
+}
+ 
+sendHeight();
+window.addEventListener('resize', sendHeight);
+</script>
+</body>
+</html>
